@@ -1,0 +1,136 @@
+Microsoft (R) Macro Assembler Version 5.10                  11/22/16 22:49:2
+                                                             Page     1-1
+
+
+				﻿DOSSEG                                      
+l5.asm(1): warning A4001: Extra characters on line
+				   .MODEL  SMALL                              
+				   .STACK  100h                               
+				   .DATA 
+				                                      
+ 0000  0000					KEEP_CS DW 0 ; для хран�
+				�ния сегмента
+ 0002  0000					KEEP_IP DW 0 ; и смещен�
+				�я прерывания
+				
+ 0004  48 65 6C 6C 6F 2E			Greeting DB 'Hello. Interruptio
+				n is actuated.',13,10,'$'
+       20 49 6E 74 65 72	
+       72 75 70 74 69 6F	
+       6E 20 69 73 20 61	
+       63 74 75 61 74 65	
+       64 2E 0D 0A 24		
+				   
+				
+				.CODE
+ 0000				begin:                               
+ 0000  BB ---- R		   mov  bx,@data                        
+ 0003  8E DB			   mov  ds,bx                           
+				   
+ 0005  B4 35				MOV AH, 35H ; функция получ
+				ения вектора
+ 0007  B0 60				MOV AL, 60H ; номер вектора
+ 0009  CD 21				INT 21H
+ 000B  89 1E 0002 R			MOV KEEP_IP, BX ; запоминани�
+				� смещения
+ 000F  8C 06 0000 R			MOV KEEP_CS, ES ; и сегмента
+				
+				
+ 0013  1E				PUSH DS
+ 0014  BA 003C R			MOV DX, OFFSET ROUT ; смещение 
+				для процедуры в DX
+ 0017  B8 ---- R			MOV AX, SEG ROUT ; сегмент пр�
+				�цедуры
+ 001A  8E D8				MOV DS, AX ; помещаем в DS
+ 001C  B4 25				MOV AH, 25H ; функция устан
+				овки вектора
+ 001E  B0 60				MOV AL, 60H ; номер вектора
+ 0020  CD 21				INT 21H ; меняем прерыван
+				ие
+ 0022  1F				POP DS
+				
+ 0023  CD 60				int 60h
+				
+ 0025  FA				CLI
+ 0026  1E				PUSH DS
+ 0027  8B 16 0002 R			MOV DX, KEEP_IP
+ 002B  A1 0000 R			MOV AX, KEEP_CS
+ 002E  8E D8				MOV DS, AX
+ 0030  B4 25				MOV AH, 25H
+Microsoft (R) Macro Assembler Version 5.10                  11/22/16 22:49:2
+                                                             Page     1-2
+
+
+ 0032  B0 60				MOV AL, 60H
+ 0034  CD 21				INT 21H ; восстанавливае�
+				� вектор
+ 0036  1F				POP DS
+ 0037  FB				STI
+				
+ 0038  B4 4C				mov  ah,4ch                         
+ 003A  CD 21				int  21h                             
+				
+ 003C					ROUT proc far ;начало проце�
+				�уры
+ 003C  50			  		push ax ;сохраняем в�
+				�е изменяемые регистры
+ 003D  52			  		push dx ;сохраняем в�
+				�е изменяемые регистры
+				 
+ 003E  B4 09			  		mov ah,9h ;функция ус�
+				�ановки вектора
+ 0040  BA 0004 R		  		mov dx,offset Greeting ;в dx �
+				�агружаем адрес сообщения
+ 0043  CD 21			  		int 21h ;вывод строк�
+				� на экран
+				  
+ 0045  5A			  		pop dx ;восстанавли�
+				�аем регистры
+ 0046  58			  		pop ax ;восстанавли�
+				�аем регистры
+ 0047  CB			  		ret
+ 0048					ROUT endp
+				
+				END begin
+Microsoft (R) Macro Assembler Version 5.10                  11/22/16 22:49:2
+                                                             Symbols-1
+
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	0027	WORD	PUBLIC	'DATA'
+  STACK  . . . . . . . . . . . .  	0100	PARA	STACK	'STACK'
+_TEXT  . . . . . . . . . . . . .  	0048	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+BEGIN  . . . . . . . . . . . . .  	L NEAR	0000	_TEXT
+
+GREETING . . . . . . . . . . . .  	L BYTE	0004	_DATA
+
+KEEP_CS  . . . . . . . . . . . .  	L WORD	0000	_DATA
+KEEP_IP  . . . . . . . . . . . .  	L WORD	0002	_DATA
+
+ROUT . . . . . . . . . . . . . .  	F PROC	003C	_TEXT	Length = 000C
+
+@CODE  . . . . . . . . . . . . .  	TEXT  _TEXT		
+@CODESIZE  . . . . . . . . . . .  	TEXT  0		
+@CPU . . . . . . . . . . . . . .  	TEXT  0101h		
+@DATASIZE  . . . . . . . . . . .  	TEXT  0		
+@FILENAME  . . . . . . . . . . .  	TEXT  l5		
+@VERSION . . . . . . . . . . . .  	TEXT  510		
+
+
+     62 Source  Lines
+     62 Total   Lines
+     22 Symbols
+
+  47976 + 461315 Bytes symbol space free
+
+      1 Warning Errors
+      0 Severe  Errors
